@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="keywords" content="部门管理">
+    <meta name="description" content="昭通日报社">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/toastr.min.css" rel="stylesheet">
+    <link href="../../static/css/wangEditor.css" rel="stylesheet">
+    <link href="../../static/css/webuploader.css" rel="stylesheet">
+    <link href="../../static/css/webuploader-demo.css" rel="stylesheet">
+    <style>
+         .empcheck{
+             display: inline-block;
+         }
+        .empcheck>input{
+            margin: 0px;
+            padding: 0px;
+            height: 13px;
+            width: 20px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .empcheck>div{
+            margin-bottom: 10px;
+            /*background: red;*/
+            display: inline-block;
+        }
+    </style>
+
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>任务管理 <small></small></h5>
+                    <a style="float: right" href="/task/list">返回列表</a>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" id="pageForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">任务主题</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <input type="text" id="taskTitle" name="taskTitle"  class="form-control">
+                                    <input type="hidden" name="id" class="form-control">
+                                    <input type="hidden" id="uploadFiles" name="uploadFiles" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">任务内容</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <div id="editor">
+                                        <p id="conInfo"></p>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="taskContent" name="taskContent">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">任务附件</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="uploader" class="wu-example">
+                                                <!--用来存放文件信息-->
+                                                <div id="thelist" class="uploader-list"></div>
+                                                <div class="btns">
+                                                    <div id="picker">选择文件</div>
+                                                    <button id="ctlBtn" onclick="uploadFile()" type="button" class="btn btn-default">开始上传</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">结束日期</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <input class="form-control layer-date" id="finishDate" name="finishDate" placeholder="YYYY-MM-DD hh:mm:ss" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                                    <label class="laydate-icon"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">任务进度</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <select class="form-control m-b" name="progress" id="progress">
+                                        <option value="0">0%</option>
+                                        <option value="10">10%</option>
+                                        <option value="20">20%</option>
+                                        <option value="30">30%</option>
+                                        <option value="40">40%</option>
+                                        <option value="50">50%</option>
+                                        <option value="60">60%</option>
+                                        <option value="70">70%</option>
+                                        <option value="80">80%</option>
+                                        <option value="90">90%</option>
+                                        <option value="100">100%</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择部门</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10">
+                                    <select class="form-control m-b" id="changeDept">
+                                        <option value="0">请选择部门</option>
+                                        <option th:each="dept:${depts}"  th:text="${dept.deptName}" th:value="${dept.id}">技术部</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">指派人员</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10" id="empsDiv">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">负责人</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-10" id="leader">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2" align="center">
+                                <button class="btn btn-primary" type="button" onclick="submitForm()">保存内容</button>
+                                <button class="btn btn-white" type="button"><a href="/task/list">返回</a></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="util/common_js"></div>
+<script type="text/javascript" src="../../static/js/wangEditor.js"></script>
+<script src="../../static/js/webuploader.min.js"></script>
+<script src="../../static/js/plugs/laydate.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var uploadFiles="";
+    var BASE_URL = '../../static/js';
+    var E = window.wangEditor
+    var editor = new E('#editor');
+    editor.customConfig.uploadImgServer = '/common/upload'; //上传URL
+    editor.customConfig.uploadFileName = 'myFileName';
+    editor.customConfig.uploadImgHooks = {
+        customInsert: function (insertImg, result, editor) {
+            var url =result.data;
+            insertImg(url);
+        }
+    }
+    editor.create();
+
+   var $list=$("#thelist");
+    var uploader = WebUploader.create({
+
+        // swf文件路径
+        swf: BASE_URL + '/js/Uploader.swf',
+
+        // 文件接收服务端。
+        server: '/common/batchUpload',
+
+        // 选择文件的按钮。可选。
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#picker',
+
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false
+    });
+
+    // 当有文件被添加进队列的时候
+    uploader.on( 'fileQueued', function( file ) {
+        $list.append( '<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+            '</div>' );
+    });
+
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on( 'uploadProgress', function( file, percentage ) {
+        var $li = $( '#'+file.id ),
+            $percent = $li.find('.progress .progress-bar');
+
+        // 避免重复创建
+        if ( !$percent.length ) {
+            $percent = $('<div class="progress progress-striped active">' +
+                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>').appendTo( $li ).find('.progress-bar');
+        }
+
+        $li.find('p.state').text('上传中');
+
+        $percent.css( 'width', percentage * 100 + '%' );
+    });
+
+    uploader.on( 'uploadSuccess', function( file ,response) {
+        debugger;
+        $( '#'+file.id ).find('p.state').text('已上传');
+        var fileName =response.data;
+        uploadFiles=uploadFiles+"#"+fileName;
+    });
+
+    uploader.on( 'uploadError', function( file) {
+
+        //获取返回文件名称
+
+        $( '#'+file.id ).find('p.state').text('上传出错');
+    });
+
+    uploader.on( 'uploadComplete', function( file ) {
+        $( '#'+file.id ).find('.progress').fadeOut();
+    });
+
+
+    function uploadFile() {
+        uploader.upload();
+    }
+
+    $("#changeDept").change(function () {
+        var val =$(this).val();
+        $.post("/admin/queryDeptUsers",{"deptId":val},function (retData) {
+            var data =retData.data;
+            $("#empsDiv").empty();
+            for(var i=0;i<data.length;i++){
+                var id=data[i].id;
+                var empName=data[i].userName;
+                var str="<div class='empcheck'><input name='adminUsers' value='"+id+"' onclick='checkUser(this,"+id+")' type='checkbox'><div id='user"+id+"'>"+empName+"</div></div>";
+                $("#empsDiv").append(str);
+            }
+        })
+    })
+
+    function  submitForm() {
+        $("#uploadFiles").val(uploadFiles);
+        debugger;
+        var content =editor.txt.html();
+        var taskTitle=$("#taskTitle").val();
+        var finishDate =$("#finishDate").val();
+        if(finishDate==''||finishDate==undefined||taskTitle==''||taskTitle==undefined||content==''||content=='<p></p><p><br></p>'){
+            toast('error','温馨提示',"请填写完整信息");
+            return;
+        }
+        if(!$("input[type='checkbox']").is(':checked')){
+            toast('error','温馨提示',"请选择指派人员");
+            return;
+        }
+        $("#taskContent").val(content);
+        var url="/task/add";
+        var data=$("#pageForm").serialize();
+        sumitData(url,data);
+    }
+    
+    function checkUser(obj,id) {
+       alert(id);
+        var name =$("#user"+id).text();
+       if($(obj).prop('checked')){
+           var str="<div id='radio"+id+"' class='empcheck'><input name='taskLeader' type='radio' value='"+id+"'><span>"+name+"</span></div>";
+           $("#leader").append(str);
+      }else {
+         $("#radio"+id).remove();
+      }
+    }
+
+    /*]]>*/
+</script>
+</body>
+
+</html>

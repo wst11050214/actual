@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title></title>
+    <meta name="keywords" content="部门管理">
+    <meta name="description" content="昭通日报社">
+    <!--<link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">-->
+    <!--<link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">-->
+    <!--<link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">-->
+    <link href="../../static/css/jquery.orgchart.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div id="left">
+
+    <ul id="organisation" style="display: none">
+        <li><em><span th:text="${company}"></span></em>
+            <ul>
+                <li th:each="dept:${depts}"><span th:text="${dept.deptName}"></span><br/>
+                    <ul>
+                        <li th:each="secDept:${dept.subDepts}"><span th:text="${secDept.deptName}">技术测试</span>
+                            <ul>
+                                <li th:each="thdept:${secDept.subDepts}" th:text="${thdept.deptName}"></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+</div>
+
+<div id="content">
+    <div style="display: flex">
+        <div style="width: 90%" align="center"><h1>部门组织结构</h1></div>
+           <div><a href="/dept/list">返回列表</a></div>
+        </div>
+    <div id="main">
+    </div>
+
+
+</div>
+
+</body>
+<div th:include="util/common_js"></div>
+<script type="application/javascript" src="../../static/js/jquery.orgchart.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    $(function() {
+        $("#organisation").orgChart({container: $("#main")});
+    });
+    /*]]>*/
+</script>
+
+</html>

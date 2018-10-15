@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="keywords" content="角色管理">
+    <meta name="description" content="昭通日报社">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/toastr.min.css" rel="stylesheet">
+    <style>
+        .am-checkbox-inline{
+            color: #666666;
+            font-weight: 200;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>角色管理 <small></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" id="pageForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">角色名称</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+                                    <input type="text" id="roleName" name="roleName"  th:value="${form.roleName}"  class="form-control">
+                                    <input type="hidden" name="id" th:value="${form.id}"  class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">选择权限</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+
+                                    <div class="power-line" th:each="modPermission:${permissionMap}" style="padding-left:12px">
+                                        <div class="row">
+                                            <label class="am-checkbox-inline" style="font-weight:bold;">
+                                                <input  type="checkbox" class="selectAll" th:text="${modPermission.key}" th:id="${modPermission.key}"  th:value="${modPermission.key}"/>
+                                            </label>
+                                        </div>
+                                        <div class="row margin-left-30" style="width:100%;overflow:hidden;padding-left:40px">
+                                            <label class="am-checkbox-inline">
+                                                <label th:each="permission,cursatate:${modPermission.value}"  class="am-checkbox-inline" >
+                                                    <div  th:class="${modPermission.key}" style="float: left;font-size: 16px">
+                                                        <div th:if="${permission.roles.contains(form)}" >
+                                                            <input  th:class="${permission.modName}" th:value="${permission.id}" style="height: 16px;width: 16px"  type="checkbox" checked="checked" name="permissions" th:text="${permission.modName}"/>
+                                                        </div>
+                                                        <div th:if="${permission.roles.contains(form)==false}">
+                                                            <input  th:class="${permission.modName}" th:value="${permission.id}" style="height: 16px;width: 16px" type="checkbox" name="permissions" th:text="${permission.modName}"/>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </label>
+                                        </div>
+                                        <div class="divider"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2" align="center">
+                                <button class="btn btn-primary" type="button" onclick="submitRoleData()">保存内容</button>
+                                <button class="btn btn-white" type="button"><a href="/dept/add">返回</a></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="util/common_js"></div>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    $(".selectAll").click(function () {
+        var tag =$(this).val();
+        if($(this).prop("checked")){
+            var checkInput=$("div "+"."+tag+" input");
+            for(var i=0;i<checkInput.length;i++){
+                $(checkInput[i]).attr('checked', 'checked');
+            }
+        }else {
+            var checkInput=$("div "+"."+tag+" input");
+            for(var i=0;i<checkInput.length;i++){
+                $(checkInput[i]).removeAttr("checked");
+            }
+        }
+    });
+
+    function  submitRoleData() {
+        debugger;
+        var roleName=$("#roleName").val();
+        if(roleName==''){
+            toast("error",'温馨提示','角色名称不能为空');
+            return;
+        }
+        var url="/role/add";
+        var data =$("#pageForm").serialize();
+        $.post(url,data,function (retData) {
+            if(retData.code==0){
+                toast("success",'温馨提示',"操作成功");
+                setTimeout(function(){
+                    requestUrl(retData.jumpUrl);
+                },1000);
+            }else {
+                toast("error","提交失败");
+                return;
+            }
+        })
+
+    }
+    /*]]>*/
+</script>
+</body>
+
+</html>

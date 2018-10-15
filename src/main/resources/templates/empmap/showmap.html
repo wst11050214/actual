@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=8nX4DmebrMot8ENi3Ty6GaZzLFmKw2t6"></script>
+    <title>设置点的新图标</title>
+</head>
+<body>
+<div id="allmap"></div>
+</body>
+</html>
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");
+    var point = new BMap.Point(103.71, 27.34);
+    map.centerAndZoom(point, 8);
+    map.enableScrollWheelZoom(true); //设置可以缩放
+
+    //创建小狐狸
+    var pt = new BMap.Point(103.71, 27.34);
+    var pt2 = new BMap.Point(103.88, 27.75);
+    var pt3 = new BMap.Point(103.84, 27.73);
+    var myIcon = new BMap.Icon("http://imgs.ztnews.net/fox.png", new BMap.Size(400,158));
+    var marker2 = new BMap.Marker(pt,{icon:myIcon});  // 创建标注
+    marker2.setAnimation(BMAP_ANIMATION_BOUNCE);
+
+    var marker3 = new BMap.Marker(pt2,{icon:myIcon});  // 创建标注
+    marker3.setAnimation(BMAP_ANIMATION_BOUNCE);
+
+    map.addOverlay(marker2);              // 将标注添加到地图中
+    map.addOverlay(marker3);              // 将标注添加到地图中
+
+    var label = new BMap.Label("王大厨-昭阳--洒渔",{offset:new BMap.Size(60,20)});
+    marker2.setLabel(label);
+
+    var label2 = new BMap.Label("龙哥--大关",{offset:new BMap.Size(60,20)});
+    marker3.setLabel(label2);
+
+    var marker = new BMap.Marker(pt3,{icon:myIcon});  // 创建标注
+    map.addOverlay(marker);
+
+    var label = new BMap.Label("凤姐-永善",{offset:new BMap.Size(60,20)});
+    marker.setLabel(label);
+</script>

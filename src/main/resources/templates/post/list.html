@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title></title>
+    <meta name="keywords" content="岗位管理">
+    <meta name="description" content="昭通日报社">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/sweetalert.css" rel="stylesheet">
+    <link href="../../static/css/toastr.min.css" rel="stylesheet">
+    <style>
+        .add-box{
+            display: flex;
+            align-items: center;
+        }
+       .add-box>a{
+           width: 100%;
+           display: flex;
+           /*左右居中*/
+           justify-content: center;
+           /*上下居中*/
+           align-items: center;
+           /*background-color: #F7F5D3;*/
+       }
+        .add-box>img{
+            width: 120px;
+            height: 120px;
+        }
+        .clearfix>i{
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .list-view{
+            height: 192px;
+
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-4 list-view" th:each="post:${page.content}">
+            <div class="contact-box">
+                   <a href="javascript:void(0)">
+                    <div class="col-sm-12" style="height: 133px;">
+                        <h3><strong th:text="${post.postName}"></strong></h3>
+                        <address th:text="${post.postDesc}" style="height: 92px;overflow: hidden;text-overflow: ellipsis;">
+                        </address>
+                    </div>
+                    <div class="clearfix" align="right">
+                        <i class="fa fa-edit" data-toggle="modal" data-target="#myModal" th:onclick="'javascript:edit(\''+${post.id}+'\')'"></i>
+                        <i class="fa fa-eye" data-toggle="modal" data-target="#myModal2" th:onclick="'javascript:show(\''+${post.id}+'\')'"></i>
+                        <i class="fa fa-trash" th:onclick="'javascript:deletet(\''+${post.id}+'\')'"></i>
+                    </div>
+                   </a>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="contact-box add-box">
+                <a href="javascript:void(0)"  data-toggle="modal" data-target="#myModal">
+                <img src="../../static/images/add.png">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>新增岗位 <small></small></h5>
+                    </div>
+               <div class="ibox-content">
+                <form method="post" id="pageForm" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">岗位名称</label>
+                        <div class="col-sm-10">
+                                <input type="text" name="postName" id="postName"  class="form-control">
+                                <input type="hidden" id="postId" name="id" class="form-control">
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">默认分值</label>
+                        <div class="col-sm-10">
+                            <input type="number" name="postScore" id="postScore"  class="form-control">
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">职责说明</label>
+                        <div class="col-sm-10">
+                              <textarea rows="8" id="postDesc" name="postDesc"  class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-4" align="center">
+                            <button class="btn btn-primary" type="button" onclick="submitForm()">保存内容</button>
+                            <button class="btn btn-white" type="button" data-dismiss="modal">返回</button>
+                        </div>
+                    </div>
+                </form>
+               </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5 id="postShowName"></h5>
+                    </div>
+                    <div class="ibox-content" id="post-desc-content">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</body>
+<div th:include="util/common_js"></div>
+<div th:include="util/bootstarp_js"></div>
+<script type="application/javascript" src="../../static/js/sweetalert.min.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    function submitForm() {
+        var deptName=$("#postName").val();
+        if(deptName==''){
+            toast("error",'温馨提示','岗位名称不能为空');
+            return;
+        }
+        var  postDesc =$("#postDesc").val();
+        if(postDesc==''){
+            toast("error",'温馨提示','岗位介绍不能为空');
+            return;
+        }
+        var postScore =$("#postScore").val();
+        if(postScore==''||postScore==null){
+            toast("error",'温馨提示','岗位默认分值不能为空');
+            return;
+        }
+        var url="/post/add";
+        var data =$("#pageForm").serialize();
+        sumitData(url,data);
+    }
+
+    function deletet(id) {
+       var args={"id":id};
+       delConfirm("/post/delete",args,"/post/list");
+    }
+
+    function edit(id) {
+        var agrs={"id":id};
+        $.post("/post/edit",agrs,function (retdata) {
+            var post=retdata.data;
+            $("#postId").val(post.id);
+            $("#postName").val(post.postName);
+            $("#postDesc").val(post.postDesc);
+        })
+    }
+
+    function show(id) {
+        var agrs={"id":id};
+        $.post("/post/edit",agrs,function (retdata) {
+            var post = retdata.data;
+            $("#postShowName").text(post.postName);
+            $("#post-desc-content").text(post.postDesc);
+        });
+    }
+
+    /*]]>*/
+</script>
+</html>

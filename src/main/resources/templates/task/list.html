@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="keywords" content="任务管理">
+    <meta name="description" content="昭通日报社">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/sweetalert.css" rel="stylesheet">
+    <style>
+        .project-people>a{
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>任务中心</h5>
+                    <div class="ibox-tools">
+                        <a href="/task/add" class="btn btn-primary btn-xs">创建新任务</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm" style="border-bottom: 1px solid #eeeeee;padding-bottom: 10px">
+                        <div class="col-md-1">
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i class="fa fa-refresh"></i>
+                            <a href="/task/list">刷新</a>
+                            </button>
+                        </div>
+                        <div class="col-md-11">
+                            <form action="/dept/list">
+                                <div class="input-group">
+                                    <div>
+                                        <span>任务状态:</span>
+                                        <select class="input-sm form-control" style="height: 32px">
+                                            <option>进行中</option>
+                                            <option>已结束</option>
+                                            <option>已取消</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <span>任务名称:</span> <input type="text" name="deptName" placeholder="任务名称" class="input-sm form-control" >
+                                    </div>
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="project-list">
+
+                        <table class="table table-hover">
+                            <tbody>
+                            <tr th:if="${tasks!=null&&tasks.size()>0}" th:each="task:${tasks}">
+                                <td class="project-status">
+                                    <span class="label label-primary" th:if="${task.taskState==1}">进行中</span>
+                                    <span class="label label-primary" th:if="${task.taskState==2}">已取消</span>
+                                    <span class="label label-primary" th:if="${task.taskState==3}">已完成</span>
+                                </td>
+                                <td class="project-title">
+                                    <a href="project_detail.html" th:text="${task.taskTitle}"></a>
+                                    <br/>
+                                    <small th:text="'创建于 '+${#dates.format(task.createDate,'yyyy-MM-dd HH:mm:ss')}"> </small>
+                                </td>
+                                <td class="project-completion">
+                                    <small th:text="'当前进度：'+${task.progress}+'%'"> 48%</small>
+                                    <div class="progress progress-mini">
+                                        <div  th:style="'width:'+@{(${task.progress})}+'%'" class="progress-bar"></div>
+                                    </div>
+                                </td>
+                                <td class="project-people">
+                                    <a href="projects.html" th:each="user:${task.adminUserList}" th:text="${user.userName}"></a>
+                                </td>
+                                <td class="project-actions">
+                                    <a th:href="@{/task/show(id=${task.id})}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> 查看 </a>
+                                    <a href="javascript:void(0)" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i> 编辑 </a>
+                                    <a href="javascript:void(0)" class="btn btn-white btn-sm" th:onclick="'javascript:delTask(\''+${task.id}+'\')'"><i class="fa fa-pencil"></i> 删除 </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${tasks==null||tasks.size()==0}" >
+                                <td class="project-title" colspan="5">暂无相关任务</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<div th:include="util/common_js"></div>
+<div th:include="util/bootstarp_js"></div>
+<script type="application/javascript" src="../../static/js/sweetalert.min.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    function delTask(id) {
+       var args={"id":id};
+       delConfirm("/task/delete",args,"/task/list");
+    }
+
+    /*]]>*/
+</script>
+</html>

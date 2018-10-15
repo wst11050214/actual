@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title></title>
+    <meta name="keywords" content="部门管理">
+    <meta name="description" content="昭通日报社">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/sweetalert.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>员工管理</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-sm-2 m-b-xs">
+                        <div class="btn-group hidden-xs" id="exampleToolbar" role="group">
+                            <button type="button" class="btn btn-outline btn-default">
+                                <i class="glyphicon glyphicon-plus" aria-hidden="true"></i><a href="/admin/add">新增员工</a>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-10">
+                        <form action="/admin/list">
+                        <div class="input-group">
+                            <div>
+                               <span>员工姓名:</span> <input type="text" name="deptName" placeholder="员工姓名" class="input-sm form-control">
+                            </div>
+                            <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>员工姓名</th>
+                            <th>登录账号</th>
+                            <th>手机号码</th>
+                            <th>所属部门</th>
+                            <th>工作岗位</th>
+                            <th>对应角色</th>
+                            <th>员工状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="form:${page.content}">
+                            <td><span th:text="${form.userName}"></span></td>
+                            <td><span th:text="${form.loginName}"></span></td>
+                            <td><span th:text="${form.phoneNo}"></span></td>
+                            <td><span th:if="${form.department!=null}" th:text="${form.department.deptName}">技术部</span></td>
+                            <td><span th:if="${form.post!=null}" th:text="${form.post.postName}">技术部</span></td>
+                            <td><span th:if="${form.role!=null}" th:text="${form.role.roleName}"></span></td>
+                            <td>
+                                <span th:if="${form.state==1}">正常</span>
+                                <span th:if="${form.state!=1}">异常</span>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" style="margin-left: 5px" th:onclick="'javascript:deletet(\''+${form.id}+'\')'"><i class="glyphicon glyphicon-trash"></i>删除</a>
+                                <a th:href="@{/admin/edit(id=${form.id})}" href="" style="margin-left: 5px"><i class="glyphicon glyphicon-pencil"></i>编辑</a>
+                                <a th:href="@{/admin/bind(id=${form.id})}" style="margin-left: 5px"><i class="glyphicon glyphicon-hand-up"></i>绑定</a>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${page.content.size()==0}">
+                            <th colspan="7" align="center">暂无相关记录</th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+<div th:include="util/common_js"></div>
+<div th:include="util/bootstarp_js"></div>
+<script type="application/javascript" src="../../static/js/sweetalert.min.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    function deletet(id) {
+       var args={"id":id};
+       delConfirm("/admin/delete",args,"/admin/list");
+    }
+
+    /*]]>*/
+</script>
+</html>
