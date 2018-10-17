@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="keywords" content="分类管理">
+    <meta name="description" content="农润">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../static/css/toastr.min.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>分类管理 <small></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" id="pageForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分类名称</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+                                    <input type="text"  name="cateName" id="cateName"  class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分类等级:</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+                                    <select class="form-control" id="cateClass" name="cateClass">
+                                        <option value="">选择等级</option>
+                                        <option value="1">1级分类</option>
+                                        <option value="2">2级分类</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="supcate-group">
+                            <label class="col-sm-2 control-label">上级分类:</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+                                    <select class="form-control" id="supcateSle" name="supCate.id">
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">图标:</label>
+                            <div class="col-sm-10">
+                                <div class="col-md-6">
+                                    <input type="text" id="cateIcon" name="cateIcon"  placeholder="分类图标"   class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2" align="center">
+                                <button class="btn btn-primary" type="button" onclick="submitFormData()">保存内容</button>
+                                <button class="btn btn-white" type="button"><a href="/goodsCategory/list">返回</a></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="util/common_js"></div>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    $("#supcate-group").hide();
+    var tempCateClass="";
+    $("#cateClass").change(function () {
+        var cateClass=$(this).val();
+        tempCateClass=cateClass;
+        if(cateClass==2){
+            $("#supcate-group").show();
+             querySupCates();
+        }else {
+            $("#supcate-group").hide();
+        }
+    });
+
+    function querySupCates() {
+        $("#supcateSle").empty();
+        var args={"cateClass":1};
+        $.post("/goodsCategory/queryCateByClass",args,function (retData) {
+            var cates =retData.data;
+            $("#supcateSle").append("<option value=''>选择父级分类</option>");
+            for(var i=0;i<cates.length;i++){
+                $("#supcateSle").append(" <option value='"+cates[i].id+"'>"+cates[i].cateName+"</option>")
+            }
+        });
+    }
+
+    function  submitFormData() {
+        if(!checkInput($("#cateName"),"分类名称不能为空")||!checkInput($("#cateClass"),"选择分类等级")){
+            return false;
+        }
+        var cateClass = $("#cateClass").val();
+        var supCate=$("#supcateSle").val();
+        if(cateClass==2&& supCate==''){
+            if(!checkInput($("#password"),"选择上级分类")){
+                return;
+            }
+        }
+        var url="/goodsCategory/add";
+        sumitData(url,$("#pageForm").serialize());
+    }
+    /*]]>*/
+</script>
+</body>
+
+</html>
